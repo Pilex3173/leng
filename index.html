@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Meja LENG -Online</title>
+<title>Meja Truf 108 - Online</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -81,9 +81,8 @@
   .meld-group h3{margin:0 0 8px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);font-weight:600;}
   .meld-row{display:flex;flex-wrap:wrap;gap:14px;}
   .meld{background:rgba(0,0,0,0.22);border:1px dashed rgba(212,175,55,0.4);border-radius:12px;padding:10px;display:flex;flex-direction:column;gap:8px;}
-  .meld .cards{display:flex;}
-  .meld .cards .card{margin-left:-14px;}
-  .meld .cards .card:first-child{margin-left:0;}
+  .meld .cards{display:flex;flex-wrap:wrap;gap:8px;}
+  .meld .cards .card{margin-left:0;}
   .meld-actions{display:flex;justify-content:flex-end;}
   .meld-actions button{padding:6px 10px;font-size:12px;}
   .empty-note{color:#9fc0ab;font-size:13px;font-style:italic;}
@@ -132,6 +131,7 @@
 </head>
 <body>
 <div id="app"></div>
+
 <script>
 window.TRUF_SERVER_URL = "https://api.pilex.web.id";
 </script>
@@ -141,10 +141,12 @@ window.TRUF_SERVER_URL = "https://api.pilex.web.id";
 "use strict";
 
 /* ==========================================================
- * GANTI INI ke alamat backend Anda setelah deploy ke VPS!
- * Contoh: "https://truf-api.domainanda.com"
+ * URL backend produksi (VPS) sudah di-set di atas lewat
+ * window.TRUF_SERVER_URL. Fallback ke localhost hanya untuk
+ * pengembangan lokal.
  * ========================================================== */
 const SERVER_URL = window.TRUF_SERVER_URL || "http://localhost:8181";
+
 
 const SUIT_SYMBOL = {S:'♠',H:'♥',D:'♦',C:'♣'};
 const RANKS = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
@@ -429,7 +431,8 @@ function renderMelds(){
   const canAct = s.you.canPlayNew;
   let runsHtml = s.table.runs.map(r=>{
     const ordered = computeRunOrder(r);
-    const orderLabel = r.mode==='low' ? 'As=Bawah &middot; urut A&rarr;K' : (r.mode==='high' ? 'As=Atas &middot; urut 2&rarr;As' : '');
+    const lockedMode = s.aceModes ? s.aceModes[r.suit] : null;
+    const orderLabel = lockedMode==='low' ? 'Rumpun ini: As=Bawah (A&rarr;K)' : (lockedMode==='high' ? 'Rumpun ini: As=Atas (2&rarr;As)' : 'Rumpun ini: konvensi As belum ditentukan');
     const cardsHtml = `<div class="cards">${ordered.map(c=>cardHtml(c,false)).join('')}</div>`;
     const btn = canAct ? `<button class="btn-ghost" data-act="extend-run" data-id="${r.id}">Tambah kartu terpilih</button>` : '';
     return `<div class="meld">${orderLabel?`<span class="hint" style="font-size:11px;">${orderLabel}</span>`:''}${cardsHtml}<div class="meld-actions">${btn}</div></div>`;
