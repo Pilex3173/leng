@@ -91,20 +91,24 @@
   .hand-wrap{margin-top:20px;}
   .hand-label{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
   .hand-fan{display:flex;flex-wrap:wrap;gap:0;padding:6px 0 10px;}
-  .card{width:52px;height:74px;background:var(--card-bg);border-radius:8px;display:flex;flex-direction:column;justify-content:space-between;align-items:flex-start;padding:5px 6px;box-shadow:0 3px 8px -3px rgba(0,0,0,0.5), 0 0 0 1px rgba(0,0,0,0.06);margin-left:-16px;position:relative;flex:none;}
+  .card{width:64px;height:90px;background:var(--card-bg);border-radius:9px;display:flex;flex-direction:column;justify-content:space-between;align-items:stretch;padding:6px 7px;box-shadow:0 3px 10px -3px rgba(0,0,0,0.55), 0 0 0 1.5px rgba(0,0,0,0.15);margin-left:-20px;position:relative;flex:none;}
   .card:first-child{margin-left:0;}
   .hand-fan .card{cursor:pointer;transition:transform .15s ease, box-shadow .15s ease, margin .15s ease;}
-  .hand-fan .card:hover{transform:translateY(-8px);z-index:5;box-shadow:0 10px 16px -6px rgba(0,0,0,0.6);}
-  .card.selected{transform:translateY(-14px);box-shadow:0 0 0 2px var(--gold), 0 10px 16px -6px rgba(0,0,0,0.6);z-index:6;}
-  .card .rank{font-weight:800;font-size:14px;line-height:1;}
-  .card .suit{font-size:18px;line-height:1;align-self:flex-end;}
-  .card.red .rank,.card.red .suit{color:var(--red);}
-  .card.black .rank,.card.black .suit{color:var(--ink);}
+  .hand-fan .card:hover{transform:translateY(-10px);z-index:5;box-shadow:0 12px 18px -6px rgba(0,0,0,0.65);}
+  .card.selected{transform:translateY(-16px);box-shadow:0 0 0 3px var(--gold), 0 12px 18px -6px rgba(0,0,0,0.65);z-index:6;}
+  .card .corner{display:flex;flex-direction:column;align-items:center;line-height:1;}
+  .card .corner.br{align-self:flex-end;transform:rotate(180deg);}
+  .card .rank{font-weight:800;font-size:16px;line-height:1;}
+  .card .suit{font-size:16px;line-height:1;margin-top:1px;}
+  .card .center-suit{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:26px;opacity:.9;pointer-events:none;}
+  .card.red .rank,.card.red .suit,.card.red .center-suit{color:var(--red);}
+  .card.black .rank,.card.black .suit,.card.black .center-suit{color:var(--ink);}
   .card.joker{background:linear-gradient(160deg,#f7f3ea,#f0e6c8);}
-  .card.joker .rank{color:var(--maroon);font-size:10px;letter-spacing:.02em;}
-  .card.joker .suit{color:var(--maroon);}
-  .card.wild::after{content:"";position:absolute;inset:2px;border:1px solid rgba(212,175,55,0.7);border-radius:6px;pointer-events:none;}
-  .card .sub-label{position:absolute;bottom:3px;left:0;right:0;text-align:center;font-size:8px;font-weight:700;color:var(--maroon);letter-spacing:.01em;line-height:1;pointer-events:none;}
+  .card.joker .rank{color:var(--maroon);font-size:11px;letter-spacing:.02em;}
+  .card.joker .suit,.card.joker .center-suit{color:var(--maroon);}
+  .card.wild{box-shadow:0 3px 10px -3px rgba(0,0,0,0.55), 0 0 0 2px var(--gold);}
+  .card.wild::after{content:"";position:absolute;inset:3px;border:1px dashed rgba(212,175,55,0.85);border-radius:7px;pointer-events:none;}
+  .card .sub-label{position:absolute;bottom:3px;left:0;right:0;text-align:center;font-size:9px;font-weight:700;color:var(--maroon);background:rgba(255,255,255,0.75);border-radius:3px;letter-spacing:.01em;line-height:1.4;pointer-events:none;}
 
   .action-bar{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;align-items:center;}
   .selection-count{font-size:12px;color:#bcd0c2;}
@@ -123,7 +127,7 @@
   .conn-dot{width:9px;height:9px;border-radius:50%;background:#5cd48a;display:inline-block;margin-right:6px;}
   .conn-dot.off{background:#ffb4ac;}
 
-  @media (max-width:560px){ .card{width:44px;height:62px;} .card .suit{font-size:15px;} }
+  @media (max-width:560px){ .card{width:52px;height:74px;} .card .rank{font-size:13px;} .card .suit{font-size:13px;} .card .center-suit{font-size:20px;} }
 </style>
 </head>
 <body>
@@ -323,11 +327,18 @@ function cardHtml(card, selectable){
   const subHtml = card.subRank ? `<span class="sub-label">&#8776;${card.subRank}${card.subSuit && SUIT_SYMBOL[card.subSuit] ? SUIT_SYMBOL[card.subSuit] : ''}</span>` : '';
   if(card.suit==='JOKER'){
     return `<button class="card joker${wild}${sel}" ${selectable?`data-cardid="${card.id}"`:''} ${selectable?'':'tabindex="-1" disabled'}>
-      <span class="rank">JOKER</span><span class="suit">★</span>${subHtml}</button>`;
+      <span class="corner tl"><span class="rank">JKR</span><span class="suit">★</span></span>
+      <span class="center-suit">★</span>
+      <span class="corner br"><span class="rank">JKR</span><span class="suit">★</span></span>
+      ${subHtml}</button>`;
   }
   const colorClass = (card.suit==='H'||card.suit==='D') ? 'red':'black';
+  const sym = SUIT_SYMBOL[card.suit];
   return `<button class="card ${colorClass}${wild}${sel}" ${selectable?`data-cardid="${card.id}"`:''} ${selectable?'':'tabindex="-1" disabled'}>
-    <span class="rank">${card.rank}</span><span class="suit">${SUIT_SYMBOL[card.suit]}</span>${subHtml}</button>`;
+    <span class="corner tl"><span class="rank">${card.rank}</span><span class="suit">${sym}</span></span>
+    <span class="center-suit">${sym}</span>
+    <span class="corner br"><span class="rank">${card.rank}</span><span class="suit">${sym}</span></span>
+    ${subHtml}</button>`;
 }
 
 function renderHome(){
@@ -401,21 +412,27 @@ function renderPlayerChips(){
 }
 
 function computeRunOrder(run){
+  // Urutkan kartu rangkaian (run) sesuai konvensi As rumpun ini: 'low' = A,2,3...K (bawah->atas),
+  // 'high' = 2,3...K,A (bawah->atas). Kartu wild (JOKER / As Sekop) ditempatkan sesuai subRank
+  // (posisi yang ia gantikan di rangkaian), jika belum ditentukan taruh di akhir.
   const seq = run.mode==='low' ? SEQ_LOW : SEQ_HIGH;
-  const normals = run.cards.filter(c=>!isWildCard(c));
-  if(normals.length===0) return run.cards.map(c=>({card:c}));
-  const idxs = normals.map(c=>seq.indexOf(c.rank));
-  const start = Math.max(0, Math.min(...idxs));
-  return run.cards; // urutan simpel: sesuai urutan tersimpan di server (cukup untuk tampilan)
+  const posOf = (c)=>{
+    if(!isWildCard(c)) return seq.indexOf(c.rank);
+    if(c.subRank) return seq.indexOf(c.subRank);
+    return seq.length; // belum ditentukan -> taruh paling belakang
+  };
+  return run.cards.slice().sort((a,b)=>posOf(a)-posOf(b));
 }
 
 function renderMelds(){
   const s = state.server;
   const canAct = s.you.canPlayNew;
   let runsHtml = s.table.runs.map(r=>{
-    const cardsHtml = `<div class="cards">${r.cards.map(c=>cardHtml(c,false)).join('')}</div>`;
+    const ordered = computeRunOrder(r);
+    const orderLabel = r.mode==='low' ? 'As=Bawah &middot; urut A&rarr;K' : (r.mode==='high' ? 'As=Atas &middot; urut 2&rarr;As' : '');
+    const cardsHtml = `<div class="cards">${ordered.map(c=>cardHtml(c,false)).join('')}</div>`;
     const btn = canAct ? `<button class="btn-ghost" data-act="extend-run" data-id="${r.id}">Tambah kartu terpilih</button>` : '';
-    return `<div class="meld">${cardsHtml}<div class="meld-actions">${btn}</div></div>`;
+    return `<div class="meld">${orderLabel?`<span class="hint" style="font-size:11px;">${orderLabel}</span>`:''}${cardsHtml}<div class="meld-actions">${btn}</div></div>`;
   }).join('');
   let voxHtml = s.table.voxes.map(v=>{
     const cardsHtml = `<div class="cards">${v.cards.map(c=>cardHtml(c,false)).join('')}</div>`;
@@ -483,8 +500,26 @@ function renderFoldBreakdown(){
 }
 function renderAceModeBadge(){
   const s = state.server;
+  // Konvensi As HARUS independen per rumpun kartu (Hati, Wajik, Keriting). As Sekop tidak masuk
+  // hitungan karena ia kartu wild/joker tambahan. Begini logikanya:
+  // - Begitu ada pemain yang membuat modal rangkaian As-bawah (A,2,3,...) pada rumpun X,
+  //   rumpun X TERKUNCI ke mode 'low' untuk sisa permainan ini.
+  // - Sebaliknya jika modal pertama pada rumpun X adalah rangkaian As-atas (...,Q,K,As),
+  //   rumpun X TERKUNCI ke mode 'high'.
+  // - Pemain lain tidak boleh lagi membuat rangkaian dengan mode berlawanan pada rumpun yang sama.
+  // Jika server sudah mengirim status per-rumpun (s.aceModes = {H:'low'|'high'|null, D:.., C:..}),
+  // tampilkan tiga badge terpisah. Jika belum (format lama s.aceMode tunggal), tampilkan fallback
+  // dan beri catatan bahwa aturan ini perlu ditegakkan di server per rumpun.
+  const suitLabel = {H:'Hati ♥',D:'Wajik ♦',C:'Keriting ♣'};
+  const modeLabel = (m)=> m==='low' ? 'Bawah (A&rarr;K)' : (m==='high' ? 'Atas (2&rarr;As)' : 'Bebas');
+  if(s.aceModes && typeof s.aceModes==='object'){
+    return ['H','D','C'].map(suit=>{
+      const m = s.aceModes[suit];
+      return `<span class="chip${m?' hasmodal':''}">${suitLabel[suit]}: ${modeLabel(m)}</span>`;
+    }).join('');
+  }
   const label = s.aceMode==='low' ? 'As = Bawah (nilai 1)' : (s.aceMode==='high' ? 'As = Atas (nilai 15)' : 'Belum ditentukan');
-  return `<span class="chip">Konvensi As: ${label}</span>`;
+  return `<span class="chip">Konvensi As (global): ${label}</span>`;
 }
 
 function renderGame(){
